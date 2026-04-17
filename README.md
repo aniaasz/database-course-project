@@ -23,3 +23,4 @@ Python + Postgresql
 | Customers  |   |   |
 |  Inventory |   |   |
 | Orders | | |
+| Order Detail | | |
