@@ -5,22 +5,14 @@
 Marta Komar, Anna Sznajder
 
 ## 📜 Description
-A bookstore where users can purchase books in two categories:
-* **Regular Store:** Brand-new books at standard prices.
-* **Outlet:** Slightly damaged or pre-owned books at a discount.
+A bookstore where users can purchase books in used and new books.
 
 ## 💻 Technologies
 Python + MySQL
-
 
 ---
 
 ## Schema
 
-| Table  | Description   | Fields   |
-|---|---|---|
-| Books  |   |   |
-| Customers  |   |   |
-|  Inventory |   |   |
-| Orders | | |
-| Order Detail | | |
+<img width="1154" height="562" alt="image" src="https://github.com/user-attachments/assets/77861853-bae4-4087-ae54-a434add51225" />
+
