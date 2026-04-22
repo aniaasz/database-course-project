@@ -10,7 +10,7 @@ A bookstore where users can purchase books in two categories:
 * **Outlet:** Slightly damaged or pre-owned books at a discount.
 
 ## 💻 Technologies
-Python + Postgresql
+Python + MySQL
 
 
 ---
