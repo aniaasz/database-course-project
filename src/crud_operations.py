@@ -113,6 +113,38 @@ def get_regular_books():
             return results
 
 
+def get_customer_by_name(first_name, last_name):
+    """
+    Wyświetla podstawowe dane klienta
+    """
+    with get_connection() as connection:
+        with connection.cursor(pymysql.cursors.DictCursor) as cur:
+            sql = """SELECT first_name, last_name, address, phone, email FROM Customers 
+            WHERE first_name = %s AND last_name = %s"""
+            cur.execute(sql, (first_name, last_name))
+            res = cur.fetchone()
+
+            if not res:
+                print(f"Customer {first_name} {last_name} not found")
+            return res
+
+
+def search_books(cond):
+    """
+    Wyświetla książki o danym tytule lub danego autora
+    """
+    with get_connection() as connection:
+        with connection.cursor(pymysql.cursors.DictCursor) as cur:
+            sql = """SELECT b.id, b.title, b.author, b.genre, b.publisher, b.price, s.condition FROM Books b 
+            JOIN Storage s ON s.book_id = b.id WHERE b.title LIKE %s OR b.author LIKE %s"""
+            cur.execute(sql, (f"%{cond}%", f"%{cond}%"))
+            res = cur.fetchall()
+
+            if not res:
+                print(f"Books not found")
+            return res
+
+
 def get_customer_order_history(customer_id):
     """
     Pobiera pełną historię zamówień dla jednego konkretnego klienta na podstawie jego ID
@@ -197,6 +229,22 @@ def update_storage_discount(storage_id, new_discount):
             cur.execute(sql, (new_discount, storage_id))
             connection.commit()
             print(f"Updated discount to {new_discount} for storage item ID {storage_id}")
+
+
+def move_book_to_outlet(storage_id, new_condition, discount=0):
+    """
+    Zmienia status książki i nakłada ewentualną promocję
+    """
+    if new_condition not in ['used', 'damaged']:
+        raise ValueError("Outlet condition is not valid")
+
+    with get_connection() as connection:
+        with connection.cursor() as cur:
+            sql = "UPDATE Storage SET condition = %s, discount = %s WHERE id =%s"
+            cur.execute(sql, (new_condition, discount, storage_id))
+            connection.commit()
+            print(f"Moved storage item {storage_id} to outlet")
+
 
 # OPERACJE: DELETE
 
