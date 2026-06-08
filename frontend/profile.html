@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bookstore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .bg-brown-dark { background-color: #4A3525 !important; }
+
+        .bg-beige { background-color: #D7C49E !important; }
+
+        .bg-beige-light { background-color: #F9F6F0 !important; }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="./index.html">Bookstore</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="#" onclick="pokazStrone('books-all')">Wszystkie książki</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="pokazStrone('books-regular')">Nowe</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="pokazStrone('books-used')">Używane</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="pokazStrone('books-damaged')">Zniszczone</a>
+            </li>
+
+          </ul>
+          <span class="navbar-text">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                  <a class="nav-link" href="./profile.html">Profil</a>
+                  <a class="nav-link" href="./admin.html">Admin</a>
+                  </li>
+              </ul>
+          </span>
+        </div>
+      </div>
+    </nav>
+
+
+<div class="container">
+        <div class="row g-4">
+
+            <div class="col-md-4 d-flex justify-content-center align-items-start">
+                <div class="card shadow-sm" style="width: 100%;">
+                  <img src="../assets/user.png" class="card-img-top bg-light p-3" alt="user icon" style="max-height: 250px; object-fit: contain;">
+                  <div class="card-body text-center">
+                    <h5 class="card-title fw-bold" id="card-user-name">Jan Kowalski</h5>
+                    <a href="#sekcja-historia" class="btn bg-brown-dark text-white w-100" onclick="wyswietlDane()">Zobacz dane klienta</a>
+                  </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card p-4 shadow-sm bg-white mb-4">
+                    <h4 class="mb-3 text-dark border-bottom pb-2">Dane</h4>
+
+                    <form id="formularz-profilu" onsubmit="zapiszDaneProfilu(event)">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Imię</label>
+                                <input type="text" class="form-control" id="input-imie" value="Jan" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Nazwisko</label>
+                                <input type="text" class="form-control" id="input-nazwisko" value="Kowalski" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Adres dostawy</label>
+                            <input type="text" class="form-control" id="input-adres" value="Floriańska 10, 31-021 Kraków" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Numer telefonu</label>
+                                <input type="tel" class="form-control" id="input-telefon" value="+48 123 456 789" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Adres Email</label>
+                                <input type="email" class="form-control" id="input-email" value="jan.kowalski@student.pl" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn bg-brown-dark text-white mt-2">
+                            Zapisz zmiany w bazie danych
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card p-4 shadow-sm bg-white" id="sekcja-historia">
+                    <h4 class="mb-1 text-dark border-bottom pb-2">Historia zamówień</h4>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID Zamówienia</th>
+                                    <th>Data zakupu</th>
+                                    <th>Książka</th>
+                                    <th>Stan</th>
+                                    <th>Cena</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-historii">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <script>
+        // Mockowane dane bazy potem będzie tu funkcjha get_customer_order_history
+        const listaZamowien = [
+            { id: 9841, data: "2026-06-02 16:45", tytul: "Hobbit", stan: "Nowa", cena: "50.00 zł" },
+            { id: 9520, data: "2026-05-20 11:15", tytul: "Harry Potter", stan: "Używana (Outlet)", cena: "20.00 zł" }
+        ];
+
+
+        function wyswietlHistorie() {
+            const tabela = document.getElementById('tabela-historii');
+            if (!tabela) return;
+            tabela.innerHTML = "";
+
+            listaZamowien.forEach(zam => {
+                let stanKsiazki = zam.stan === "Nowa" ? "bg-success" : "bg-warning text-dark";
+
+                tabela.innerHTML += `
+                    <tr>
+                        <td>#${zam.id}</td>
+                        <td><small class="text-muted">${zam.data}</small></td>
+                        <td class="fw-bold">${zam.tytul}</td>
+                        <td><span class="badge ${stanKsiazki}">${zam.stan}</span></td>
+                        <td class="text-primary fw-bold">${zam.cena}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function wyswietlDane(){
+
+            const imieNazwisko = document.getElementById('card-user-name');
+            const podzielone = imieNazwisko.split(' ');
+            const imie = podzielone[0];
+            const nazwisko = podzielone[1];
+
+            // wyswietlanie danych z crud
+
+        }
+
+
+        function zapiszDaneProfilu(event) {
+            event.preventDefault();
+
+            const dane = {
+                first_name: document.getElementById('input-imie').value,
+                last_name: document.getElementById('input-nazwisko').value,
+                address: document.getElementById('input-adres').value,
+                phone: document.getElementById('input-telefon').value,
+                email: document.getElementById('input-email').value
+            };
+
+            document.getElementById('card-user-name').innerText = dane.first_name + " " + dane.last_name;
+
+            // wykonanie funkcji update_customer_contact jak juz bedzie crud gotowy
+
+        }
+
+
+        wyswietlHistorie();
+    </script>
+</body>
+
+</html>
