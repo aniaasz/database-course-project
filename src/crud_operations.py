@@ -240,7 +240,7 @@ def move_book_to_outlet(storage_id, new_condition, discount=0):
 
     with get_connection() as connection:
         with connection.cursor() as cur:
-            sql = "UPDATE Storage SET condition = %s, discount = %s WHERE id =%s"
+            sql = "UPDATE Storage SET `condition` = %s, discount = %s WHERE id =%s"
             cur.execute(sql, (new_condition, discount, storage_id))
             connection.commit()
             print(f"Moved storage item {storage_id} to outlet")
