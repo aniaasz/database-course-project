@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bookstore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .bg-brown-dark { background-color: #4A3525 !important; }
+
+        .bg-beige { background-color: #D7C49E !important; }
+
+        .bg-beige-light { background-color: #F9F6F0 !important; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="./index.html">Bookstore</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="./books.html?category=all">Wszystkie książki</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./books.html?category=new">Nowe</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./books.html?category=used">Używane</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./books.html?category=damaged">Zniszczone</a>
+            </li>
+
+          </ul>
+          <span class="navbar-text">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                  <a class="nav-link" href="./profile.html">Profil</a>
+                  <a class="nav-link" href="./admin.html">Admin</a>
+                  </li>
+              </ul>
+          </span>
+        </div>
+      </div>
+    </nav>
+
+<div class="container mt-4">
+
+        <div class="card p-4 shadow-sm bg-white">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Tytuł</th>
+                            <th>Autor</th>
+                            <th>Gatunek</th>
+                            <th>Stan</th>
+                            <th>Cena</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-ksiazek">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // fake ksiazki abvy zobaczyc efekt
+    const bazaKsiazek = [
+            { tytul: "Hobbit", autor: "J.R.R. Tolkien", gatunek: "Fantasy", stan: "new", cena: "45.00 zł" },
+            { tytul: "Harry Potter", autor: "J.K. Rowling", gatunek: "Fantasy", stan: "new", cena: "39.99 zł" },
+            { tytul: "Wiedźmin", autor: "Andrzej Sapkowski", gatunek: "Fantasy", stan: "used", cena: "25.00 zł" },
+            { tytul: "Dune", autor: "Frank Herbert", gatunek: "Sci-Fi", stan: "damaged", cena: "15.00 zł" }
+        ];
+
+    function zaladujKsiazki(){
+
+        const kategoria = new URLSearchParams(window.location.search).get('category') || 'all';
+        const tabela = document.getElementById('tabela-ksiazek');
+
+        // fake filtrowanie aby zobaczyc jakis efekt na stronie
+        let przefiltrowaneKsiazki = [];
+
+        if (kategoria === 'used') {
+            //get_outlet_books('used')
+            przefiltrowaneKsiazki = bazaKsiazek.filter(k => k.stan === 'used');
+        } else if (kategoria === 'damaged') {
+            //get_outlet_books('damaged')
+            przefiltrowaneKsiazki = bazaKsiazek.filter(k => k.stan === 'damaged');
+        } else if (kategoria === 'new') {
+            // get_regular_books()
+            przefiltrowaneKsiazki = bazaKsiazek.filter(k => k.stan === 'new');
+        }else {
+            // wywolanie calego magazynu
+            przefiltrowaneKsiazki = bazaKsiazek;
+        }
+
+        przefiltrowaneKsiazki.forEach(k => {
+            let stanBadge = "";
+            if(k.stan === 'new') stanBadge = '<span class="badge bg-success">Nowa</span>';
+            else if(k.stan === 'used') stanBadge = '<span class="badge bg-warning text-dark">Używana</span>';
+            else stanBadge = '<span class="badge bg-danger">Zniszczona</span>';
+
+            tabela.innerHTML += `
+                <tr>
+                    <td class="fw-bold">${k.tytul}</td>
+                    <td>${k.autor}</td>
+                    <td><span class="badge bg-secondary">${k.gatunek}</span></td>
+                    <td>${stanBadge}</td>
+                    <td class="text-danger fw-bold">${k.cena}</td>
+                </tr>
+                `;
+            });
+
+
+    }
+
+    zaladujKsiazki();
+
+</script>
+
+
+</body>
+</html>
