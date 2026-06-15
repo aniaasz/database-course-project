@@ -73,57 +73,75 @@
     </div>
 
 <script>
-    // fake ksiazki abvy zobaczyc efekt
-    const bazaKsiazek = [
-            { tytul: "Hobbit", autor: "J.R.R. Tolkien", gatunek: "Fantasy", stan: "new", cena: "45.00 zł" },
-            { tytul: "Harry Potter", autor: "J.K. Rowling", gatunek: "Fantasy", stan: "new", cena: "39.99 zł" },
-            { tytul: "Wiedźmin", autor: "Andrzej Sapkowski", gatunek: "Fantasy", stan: "used", cena: "25.00 zł" },
-            { tytul: "Dune", autor: "Frank Herbert", gatunek: "Sci-Fi", stan: "damaged", cena: "15.00 zł" }
-        ];
+    // bazowy adres URL dla zapytań do API
+    const API_URL = "http://127.0.0.1:5000/api";
 
-    function zaladujKsiazki(){
+    // funkcja ładująca odpowiednio przefiltrowane książki
+    function loadBooks(){
+        // parametry z adresu URL
+        const params = new URLSearchParams(window.location.search);
+        const category = params.get('category') || 'all';
+        const table = document.getElementById('tabela-ksiazek');
+        // wczytanie tekstu wyszukiwanego
+        const searchQuery = params.get('search') ? params.get('search').toLowerCase().trim() : '';
+        // czyszczenie tabeli przed wczytaniem danych
+        table.innerHTML = "";
 
-        const kategoria = new URLSearchParams(window.location.search).get('category') || 'all';
-        const tabela = document.getElementById('tabela-ksiazek');
-
-        // fake filtrowanie aby zobaczyc jakis efekt na stronie
-        let przefiltrowaneKsiazki = [];
-
-        if (kategoria === 'used') {
-            //get_outlet_books('used')
-            przefiltrowaneKsiazki = bazaKsiazek.filter(k => k.stan === 'used');
-        } else if (kategoria === 'damaged') {
-            //get_outlet_books('damaged')
-            przefiltrowaneKsiazki = bazaKsiazek.filter(k => k.stan === 'damaged');
-        } else if (kategoria === 'new') {
-            // get_regular_books()
-            przefiltrowaneKsiazki = bazaKsiazek.filter(k => k.stan === 'new');
-        }else {
-            // wywolanie calego magazynu
-            przefiltrowaneKsiazki = bazaKsiazek;
+        // dobór adresu api zależnego od kategorii
+        if (category === 'used') {
+            endpointUrl = `${API_URL}/books/outlet/used`;
+        } else if (category === 'damaged') {
+            endpointUrl = `${API_URL}/books/outlet/damaged`;
+        } else if (category === 'new') {
+            endpointUrl = `${API_URL}/books/regular`;
+        }else { // dla czegokolwiek innego lub braku wybieramy wszystkie
+            endpointUrl = `${API_URL}/books/all`;
         }
 
-        przefiltrowaneKsiazki.forEach(k => {
-            let stanBadge = "";
-            if(k.stan === 'new') stanBadge = '<span class="badge bg-success">Nowa</span>';
-            else if(k.stan === 'used') stanBadge = '<span class="badge bg-warning text-dark">Używana</span>';
-            else stanBadge = '<span class="badge bg-danger">Zniszczona</span>';
 
-            tabela.innerHTML += `
-                <tr>
-                    <td class="fw-bold">${k.tytul}</td>
-                    <td>${k.autor}</td>
-                    <td><span class="badge bg-secondary">${k.gatunek}</span></td>
-                    <td>${stanBadge}</td>
-                    <td class="text-danger fw-bold">${k.cena}</td>
-                </tr>
-                `;
-            });
+        fetch(endpointUrl)
+            .then(response => response.json()) // odpowiedź na json
+            .then(books => {
+
+                let filteredBooks = books;
+
+                // jeśli użytkownik coś wyszukiwął ot filtrujemy po wyszukiwaniu
+                if (searchQuery) {
+                    filteredBooks = books.filter(k =>
+                        k.title.toLowerCase().includes(searchQuery) ||
+                        k.author.toLowerCase().includes(searchQuery)
+                    );
+                }
 
 
+                // dla każdej książki
+                filteredBooks.forEach(k => {
+
+                // ustawienie plakietki stanu - napis i kolor
+                let stanBadge = "";
+                if(k.condition === 'new') stanBadge = '<span class="badge bg-success">Nowa</span>';
+                else if(k.condition === 'used') stanBadge = '<span class="badge bg-warning text-dark">Używana</span>';
+                else stanBadge = '<span class="badge bg-danger">Zniszczona</span>';
+
+                // sprawdzenie czy istenieje cena po obniżce jak nei to bierzemy bazową
+                let price = k.price_with_discount !== undefined ? parseFloat(k.price_with_discount).toFixed(2) : parseFloat(k.price).toFixed(2);
+
+                // dodanie wiersza z danymi książki do tabeli
+                table.innerHTML += `
+                    <tr>
+                        <td class="fw-bold">${k.title}</td>
+                        <td>${k.author}</td>
+                        <td><span class="badge bg-secondary">${k.genre}</span></td>
+                        <td>${stanBadge}</td>
+                        <td class="text-danger fw-bold">${price}</td>
+                    </tr>
+                    `;
+                });
+                })
+            .catch(err => console.error("Błąd:", err));
     }
 
-    zaladujKsiazki();
+    loadBooks();
 
 </script>
 

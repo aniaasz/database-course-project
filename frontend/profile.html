@@ -59,8 +59,8 @@
                 <div class="card shadow-sm" style="width: 100%;">
                   <img src="../assets/user.png" class="card-img-top bg-light p-3" alt="user icon" style="max-height: 250px; object-fit: contain;">
                   <div class="card-body text-center">
-                    <h5 class="card-title fw-bold" id="card-user-name">Jan Kowalski</h5>
-                    <a href="#sekcja-historia" class="btn bg-brown-dark text-white w-100" onclick="wyswietlDane()">Zobacz dane klienta</a>
+                    <h5 class="card-title fw-bold" id="card-user-name">Adam Nowak</h5>
+                    <a href="#sekcja-historia" class="btn bg-brown-dark text-white w-100" onclick="loadUserData()">Zobacz dane klienta</a>
                   </div>
                 </div>
             </div>
@@ -69,7 +69,7 @@
                 <div class="card p-4 shadow-sm bg-white mb-4">
                     <h4 class="mb-3 text-dark border-bottom pb-2">Dane</h4>
 
-                    <form id="formularz-profilu" onsubmit="zapiszDaneProfilu(event)">
+                    <form id="formularz-profilu" onsubmit="saveProfileData(event)">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label small fw-bold">Imię</label>
@@ -128,49 +128,87 @@
 
 
     <script>
-        // Mockowane dane bazy potem będzie tu funkcjha get_customer_order_history
-        const listaZamowien = [
-            { id: 9841, data: "2026-06-02 16:45", tytul: "Hobbit", stan: "Nowa", cena: "50.00 zł" },
-            { id: 9520, data: "2026-05-20 11:15", tytul: "Harry Potter", stan: "Używana (Outlet)", cena: "20.00 zł" }
-        ];
+        // bazowy adres URL dla zapytań do API
+        const API_URL = "http://127.0.0.1:5000/api";
+        const CUSTOMER_ID = 1; // przykład dla klienta 1
+
+        // pobierająca historię zamówień klienta z serwera
+        function fetchOrders(){
+            fetch(`${API_URL}/customer/${CUSTOMER_ID}/history`)
+                .then(response => response.json())
+                .then(ordersList => {
+                    // wyświetlamy pobrane dane
+                        displayHistory(ordersList);
+                })
+                .catch(err => console.error("Błąd:", err));
+
+        }
 
 
-        function wyswietlHistorie() {
-            const tabela = document.getElementById('tabela-historii');
-            if (!tabela) return;
-            tabela.innerHTML = "";
+        // wyświetlanie danych
+        function displayHistory(orders) {
+            const table = document.getElementById('tabela-historii');
+            if (!table) return;
+            // czyszczenie tabeli przed załadowaniem nowych danych
+            table.innerHTML = "";
 
-            listaZamowien.forEach(zam => {
-                let stanKsiazki = zam.stan === "Nowa" ? "bg-success" : "bg-warning text-dark";
+            if (!orders || orders.length === 0) {
+                table.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Brak zamówień w bazie danych.</td></tr>`;
+                return;
+            }
 
-                tabela.innerHTML += `
+            // dla każdego zamówienia
+            orders.forEach(ord => {
+                // ustawienie koloru plakeitni zależnego od stanu książki
+                let conditionBadge = ord.condition === "new" ? "bg-success" : "bg-warning text-dark";
+                // łączna kwota całego zamówienia
+                let price = (ord.price * ord.quantity).toFixed(2);
+
+                table.innerHTML += `
                     <tr>
-                        <td>#${zam.id}</td>
-                        <td><small class="text-muted">${zam.data}</small></td>
-                        <td class="fw-bold">${zam.tytul}</td>
-                        <td><span class="badge ${stanKsiazki}">${zam.stan}</span></td>
-                        <td class="text-primary fw-bold">${zam.cena}</td>
+                        <td>#${ord.order_id}</td>
+                        <td><small class="text-muted">${ord.order_date}</small></td>
+                        <td class="fw-bold">${ord.title}</td>
+                        <td><span class="badge ${conditionBadge}">${ord.condition}</span></td>
+                        <td class="text-primary fw-bold">${price}</td>
                     </tr>
                 `;
             });
         }
 
-        function wyswietlDane(){
+        // ładująca aktualne dane użytkownika do formularza
+        function loadUserData(){
 
-            const imieNazwisko = document.getElementById('card-user-name');
-            const podzielone = imieNazwisko.split(' ');
-            const imie = podzielone[0];
-            const nazwisko = podzielone[1];
+            const fullName = document.getElementById('card-user-name').innerText;
+            const splitName = fullName.split(' ');
+            const firstName = splitName[0];
+            const lastName = splitName[1];
 
-            // wyswietlanie danych z crud
+            // wyciąganie danych klienta na podstawie imienia i nazwiska
+            fetch(`${API_URL}/customer/search?first_name=${firstName}&last_name=${lastName}`)
+                .then(response => response.json())
+                .then(customer => {
+                    if (customer) {
+                        document.getElementById('input-imie').value = customer.first_name;
+                        document.getElementById('input-nazwisko').value = customer.last_name;
+                        document.getElementById('input-adres').value = customer.address;
+                        document.getElementById('input-telefon').value = customer.phone;
+                        document.getElementById('input-email').value = customer.email;
+
+                    } else {
+                        alert("Nie znaleziono klienta w bazie");
+                    }
+                })
+                .catch(err => console.error("Błąd:", err));
 
         }
 
-
-        function zapiszDaneProfilu(event) {
+        // zapisuje zmiany danych klienta do bazy
+        function saveProfileData(event) {
             event.preventDefault();
 
-            const dane = {
+            // słownik z wszystkimi danymi użytkownika z formularza
+            const customerData = {
                 first_name: document.getElementById('input-imie').value,
                 last_name: document.getElementById('input-nazwisko').value,
                 address: document.getElementById('input-adres').value,
@@ -178,14 +216,21 @@
                 email: document.getElementById('input-email').value
             };
 
-            document.getElementById('card-user-name').innerText = dane.first_name + " " + dane.last_name;
-
-            // wykonanie funkcji update_customer_contact jak juz bedzie crud gotowy
+            fetch(`${API_URL}/customer/${CUSTOMER_ID}/update`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(customerData)
+            })
+            .then(response => response.json())
+            .then(result => { // podmiana imienia i nazwiska w karcie klienta
+                document.getElementById('card-user-name').innerText = customerData.first_name + " " + customerData.last_name;
+            })
+            .catch(err => console.error("Błąd:", err));
 
         }
 
 
-        wyswietlHistorie();
+        fetchOrders();
     </script>
 </body>
 

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Bookstore</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
         .bg-brown-dark { background-color: #4A3525 !important; }
 
@@ -61,7 +62,7 @@
                     <div class="col-md-6">
                         <div class="input-group input-group-lg">
                             <input type="text" class="form-control" placeholder="Wpisz tytuł lub autora..." id="input-szukaj">
-                            <button class="btn btn-primary" type="button" onclick="szukajKsiazki()">
+                            <button class="btn btn-primary" type="button" onclick="searchBooks()">
                                 <i class="bi bi-search"></i> Szukaj
                             </button>
                         </div>
@@ -84,7 +85,7 @@
                     <div class="card text-white bg-beige-light h-100 shadow-sm">
                         <div class="card-body text-center text-dark">
                             <i class="bi bi-percent fs-1"></i>
-                            <h5 class="card-title mt-2">Książki w Outficie</h5>
+                            <h5 class="card-title mt-2">Książki w Outlecie</h5>
                             <p class="card-text fs-3 fw-bold" id="stat-outlet">0</p>
                         </div>
                     </div>
@@ -112,15 +113,45 @@
 
 
     <script>
-        function szukajKsiazki() {
-                    const tekst = document.getElementById('input-szukaj').value;
-                    if(tekst) {
-                        // crud pobierz dane ksiazki
-                    } else {
-                        alert("Wpisz coś w wyszukiwarkę");
-                    }
-                }
+        // bazowy adres URL dla zapytań do API
+        const API_URL = "http://127.0.0.1:5000/api";
 
+        // przekierowanie do wyników wyszukiwania
+        function searchBooks() {
+            const searchQuery = document.getElementById('input-szukaj').value;
+            if(searchQuery) {
+            // jeśli użytkownik coś wpisał to przekierowujemy na stronę z książkami z danym wysuzkiwaniem
+                window.location.href = `./books.html?search=${encodeURIComponent(searchQuery)}`;
+            } else {
+                alert("Wpisz coś w wyszukiwarkę");
+            }
+        }
+
+        // nasłuchiwanie na wciśnięcie enter dla którego uruchamiamy wysziwanie
+        document.getElementById('input-szukaj').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchBooks();
+            }
+        });
+
+        // pobranie statystyk i zaktualizowanie informacji
+        function loadStats() {
+            fetch(`${API_URL}/stats`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('stat-titles').innerText = data.titles;
+                    document.getElementById('stat-outlet').innerText = data.outlet;
+                    document.getElementById('stat-orders').innerText = data.orders;
+                })
+                .catch(err => {
+                    console.error("Błąd pobierania statystyk:", err);
+                    document.getElementById('stat-titles').innerText = "-";
+                    document.getElementById('stat-outlet').innerText = "-";
+                    document.getElementById('stat-orders').innerText = "-";
+                });
+        }
+
+        loadStats();
 
     </script>
 </body>
