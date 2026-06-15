@@ -1,5 +1,5 @@
 import pymysql
-from database import get_connection
+from db_config import get_connection
 
 """Analiza sprzedaży.
 Łączy szczegóły zamówień z magazynem, grupuje po stanie książki i sumuje przychód (ilość * cena) osobno dla 'new', 'used' i 'damaged'."""
@@ -40,7 +40,7 @@ def get_loyalty_report():
 """Status magazynowy (Alert niskiego stanu)
 Wyszukuje pozycje, których liczba sztuk w magazynie spadła poniżej podanej wartości X.Dzięki temu menedżer wie, co trzeba pilnie domówić."""
 def get_low_stock_status(limit_x):
-    
+    limit_x = int(limit_x)
     with get_connection() as connection:
         with connection.cursor(pymysql.cursors.DictCursor) as cur:
             sql = """
@@ -62,8 +62,8 @@ def get_total_profits():
     with get_connection() as connection:
         with connection.cursor(pymysql.cursors.DictCursor) as cur:
             sql = """
-                SELECT SUM(quantity * price) AS total_profit
-                FROM Order_Details
+                SELECT SUM(total_amount) AS total_profit
+                FROM Orders
             """
             cur.execute(sql)
             # Fetchone because this query returns exactly one row with one sum value
@@ -73,6 +73,7 @@ def get_total_profits():
 """Najczęściej kupowane tytuły (Bestsellery).
 Zlicza łączną liczbę sprzedanych egzemplarzy dla każdego tytułu i zwraca najpopularniejsze."""
 def get_top_selling_books(limit=5):
+    limit = int(limit)
     with get_connection() as connection:
         with connection.cursor(pymysql.cursors.DictCursor) as cur:
             sql = """
