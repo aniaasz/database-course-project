@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Bookstore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        .bg-brown-dark { background-color: #4A3525 !important; }
+
+        .bg-beige { background-color: #D7C49E !important; }
+
+        .bg-beige-light { background-color: #F9F6F0 !important; }
+    </style>
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="./index.html">Bookstore</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="./books.html?category=all">Wszystkie książki</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./books.html?category=new">Nowe</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./books.html?category=used">Używane</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./books.html?category=damaged">Zniszczone</a>
+            </li>
+
+          </ul>
+          <span class="navbar-text">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                  <a class="nav-link" href="./profile.html">Profil</a>
+                  <a class="nav-link" href="./admin.html">Admin</a>
+                  </li>
+              </ul>
+          </span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+
+        <div id="strona-home">
+
+            <div class="p-5 mb-4 bg-white rounded-3 shadow-sm text-center">
+                <h1 class="display-5 fw-bold text-dark">Znajdź swoją kolejną książkę</h1>
+                <div class="row justify-content-center mt-4">
+                    <div class="col-md-6">
+                        <div class="input-group input-group-lg">
+                            <input type="text" class="form-control" placeholder="Wpisz tytuł lub autora..." id="input-szukaj">
+                            <button class="btn btn-primary" type="button" onclick="searchBooks()">
+                                <i class="bi bi-search"></i> Szukaj
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card text-black bg-beige h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-book-half fs-1"></i>
+                            <h5 class="card-title mt-2">Dostępne tytuły</h5>
+                            <p class="card-text fs-3 fw-bold" id="stat-titles">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-white bg-beige-light h-100 shadow-sm">
+                        <div class="card-body text-center text-dark">
+                            <i class="bi bi-percent fs-1"></i>
+                            <h5 class="card-title mt-2">Książki w Outlecie</h5>
+                            <p class="card-text fs-3 fw-bold" id="stat-outlet">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-white bg-brown-dark h-100 shadow-sm">
+                        <div class="card-body text-center text-white">
+                            <i class="bi bi-cart-check fs-1"></i>
+                            <h5 class="card-title mt-2">Zrealizowane zamówienia</h5>
+                            <p class="card-text fs-3 fw-bold" id="stat-orders">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="mb-3 text-secondary">🔥 Najczęściej kupowane 🔥</h3>
+            <div class="row row-cols-1 row-cols-md-3 g-4" id="bestsellery-kontener">
+                </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <script>
+        // bazowy adres URL dla zapytań do API
+        const API_URL = "http://127.0.0.1:5000/api";
+
+        // przekierowanie do wyników wyszukiwania
+        function searchBooks() {
+            const searchQuery = document.getElementById('input-szukaj').value;
+            if(searchQuery) {
+            // jeśli użytkownik coś wpisał to przekierowujemy na stronę z książkami z danym wysuzkiwaniem
+                window.location.href = `./books.html?search=${encodeURIComponent(searchQuery)}`;
+            } else {
+                alert("Wpisz coś w wyszukiwarkę");
+            }
+        }
+
+        // nasłuchiwanie na wciśnięcie enter dla którego uruchamiamy wysziwanie
+        document.getElementById('input-szukaj').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchBooks();
+            }
+        });
+
+        // pobranie statystyk i zaktualizowanie informacji
+        function loadStats() {
+            fetch(`${API_URL}/stats`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('stat-titles').innerText = data.titles;
+                    document.getElementById('stat-outlet').innerText = data.outlet;
+                    document.getElementById('stat-orders').innerText = data.orders;
+                })
+                .catch(err => {
+                    console.error("Błąd pobierania statystyk:", err);
+                    document.getElementById('stat-titles').innerText = "-";
+                    document.getElementById('stat-outlet').innerText = "-";
+                    document.getElementById('stat-orders').innerText = "-";
+                });
+        }
+
+        function loadBestsellers(){
+            const table = document.getElementById('bestsellery-kontener');
+            table.innerHTML = "";
+
+            fetch(`${API_URL}/books/bestsellers`)
+                .then(response => response.json())
+                .then(bestSellers => {
+                    if (!bestSellers || bestSellers.length === 0) {
+                        table.innerHTML = `<div class="col-12 text-center text-muted">Brak danych</div>`;
+                        return;
+                    }
+
+                    // dla każdej książki tworzymy kartę
+                    bestSellers.forEach((book,i) => {
+
+
+                        table.innerHTML += `
+                            <div class="col">
+                                <div class="card h-100 shadow-sm border-0 bg-white">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold text-dark mb-1">${book.title}</h5>
+                                        <p class="card-text text-muted small mb-3">Autor: ${book.author}</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-light text-success border border-success-subtle px-2 py-1">
+                                                Sprzedano: <strong>${book.total_sold} szt.</strong>
+                                            </span>
+                                            <a href="./books.html?search=${encodeURIComponent(book.title)}" class="btn btn-sm btn-outline-primary">
+                                                Zobacz dostępność
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                    })
+
+                })
+                .catch(err => {
+                    console.error("Błąd ładowania bestsellerów:", err);
+                });
+
+        }
+
+        loadStats();
+        loadBestsellers();
+
+    </script>
+</body>
+</html>

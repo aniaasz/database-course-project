@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bookstore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        .bg-brown-dark { background-color: #4A3525 !important; }
+
+        .bg-beige { background-color: #D7C49E !important; }
+
+        .bg-beige-light { background-color: #F9F6F0 !important; }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="./index.html">Bookstore</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="./books.html?category=all">Wszystkie książki</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./books.html?category=new">Nowe</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./books.html?category=used">Używane</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./books.html?category=damaged">Zniszczone</a>
+            </li>
+
+          </ul>
+          <span class="navbar-text">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                  <a class="nav-link" href="./profile.html">Profil</a>
+                  <a class="nav-link" href="./admin.html">Admin</a>
+                  </li>
+              </ul>
+          </span>
+        </div>
+      </div>
+    </nav>
+
+<div class="container mb-5">
+        <div class="row">
+
+            <div class="col-md-3 mb-4">
+                <div class="list-group shadow-sm bg-white rounded">
+                    <button class="list-group-item list-group-item-action active" id="tab-btn-magazyn" onclick="switchTab('magazyn')"><i class="bi bi-box-seam me-2"></i> Stan Magazynu</button>
+                    <button class="list-group-item list-group-item-action" id="tab-btn-add-book" onclick="switchTab('add-book')"><i class="bi bi-plus-circle me-2"></i> Dodaj Książkę</button>
+                    <button class="list-group-item list-group-item-action" id="tab-btn-add-customer" onclick="switchTab('add-customer')"><i class="bi bi-person-plus me-2"></i> Zarejestruj Klienta</button>
+                    <button class="list-group-item list-group-item-action" id="tab-btn-reports" onclick="switchTab('reports')"><i class="bi bi-graph-up-arrow me-2"></i> Raporty i Analizy</button>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+
+                <div id="section-magazyn" class="card p-4 shadow-sm bg-white tab-section">
+                    <h4 class="mb-3 text-danger-emphasis"><i class="bi bi-box-seam"></i> Stany magazynowe</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tytuł i Autor</th>
+                                    <th>Stan</th>
+                                    <th>Cena podstawowa</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-admin-magazyn">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="section-add-book" class="card p-4 shadow-sm bg-white tab-section" style="display:none;">
+                    <h4 class="mb-3 text-danger-emphasis"><i class="bi bi-book"></i> Dodaj nową książkę do systemu</h4>
+                    <form id="form-dodaj-ksiazke" class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Tytuł</label>
+                            <input type="text" class="form-control" id="book-title" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Autor</label>
+                            <input type="text" class="form-control" id="book-author" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Gatunek</label>
+                            <input type="text" class="form-control" id="book-genre" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Wydawnictwo</label>
+                            <input type="text" class="form-control" id="book-publisher" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Data wydania</label>
+                            <input type="date" class="form-control" id="book-date" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Cena katalogowa (zł)</label>
+                            <input type="number" step="0.01" class="form-control" id="book-price" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Ilość sztuk</label>
+                            <input type="number" class="form-control" id="book-stock" value="5" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Stan egzemplarzy</label>
+                            <select class="form-select" id="book-condition" onchange="toggleDiscountField()" required>
+                                <option value="new">Nowa (Regularna)</option>
+                                <option value="used">Używana (Outlet)</option>
+                                <option value="damaged">Zniszczona (Outlet)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4" id="discount-wrapper" style="display:none;">
+                            <label class="form-label small text-danger fw-bold">Rabat kwotowy (zł)</label>
+                            <input type="number" step="0.01" class="form-control border-danger" id="book-discount" value="0.00">
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-secondary w-100"> Zapisz pozycję w bazie</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="section-add-customer" class="card p-4 shadow-sm bg-white tab-section" style="display:none;">
+                    <h4 class="mb-3 text-danger-emphasis"><i class="bi bi-person-plus"></i> Zarejestruj nowego klienta</h4>
+                    <form id="form-dodaj-klienta" class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Imię</label>
+                            <input type="text" class="form-control" id="cust-first-name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Nazwisko</label>
+                            <input type="text" class="form-control" id="cust-last-name" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Adres zamieszkania</label>
+                            <input type="text" class="form-control" id="cust-address" placeholder="np. ul. Floriańska 12, 31-021 Kraków" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Numer telefonu</label>
+                            <input type="tel" class="form-control" id="cust-phone" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Adres Email</label>
+                            <input type="email" class="form-control" id="cust-email" required>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-secondary w-100"> Załóż konto klienta</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="section-reports" class="card p-4 shadow-sm bg-white tab-section" style="display:none;">
+                    <h4 class="mb-4 text-danger-emphasis"><i class="bi bi-bar-chart-line"></i> Wygeneruj raport</h4>
+
+                    <div class="row g-2 mb-4">
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-dark w-100 h-100 py-2" onclick="loadSalesReport()">Przychód wg stanów książek</button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-dark w-100 h-100 py-2" onclick="loadLoyaltyReport()">Klienci którzy wykonali najwięcej zamówień</button>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100 border-dark shadow-sm bg-white">
+                                <div class="card-body d-flex flex-column justify-content-between p-3">
+
+                                    <div class="text-center mb-2">
+                                        <h6 class="fw-bold text-dark mb-1">Wyszukaj niskie stany magazynowe</h6>
+                                        <small class="text-muted">Wpisz limit:</small>
+                                    </div>
+
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="report-stock-limit" value="5" min="1">
+                                        <button class="btn btn-danger text-nowrap" onclick="loadLowStockReport()">Sprawdź</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="report-results-wrapper" style="display:none;">
+                        <h5 class="border-bottom pb-2 mb-3 text-secondary" id="report-title">Wyniki raportu</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped" id="tabela-raportow">
+                                </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+<script>
+    const API_URL = "http://127.0.0.1:5000/api";
+
+        // przełączanie zakładek panelu bocznego
+        function switchTab(tabName) {
+            // ukrycie wszystkich kontenerów
+            document.querySelectorAll('.tab-section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.list-group-item').forEach(b => b.classList.remove('active'));
+
+            // pokazanie wybranej sekcji
+            document.getElementById(`section-${tabName}`).style.display = 'block';
+            document.getElementById(`tab-btn-${tabName}`).classList.add('active');
+
+            // wyczyszczenie poprzedniego raportu
+            document.getElementById('report-results-wrapper').style.display = 'none';
+
+            // jeśli wybraną sekcją jest magazyn ładujemy aktualne dane
+            if(tabName === 'magazyn') loadStorage();
+        }
+
+        // ukrywanie/pokazywanie pola rabatu przy dodawaniu książki zależnie czy dany stan książki ma możliwość rabatu
+        function toggleDiscountField() {
+            const cond = document.getElementById('book-condition').value;
+            document.getElementById('discount-wrapper').style.display = (cond === 'new') ? 'none' : 'block';
+            if(cond === 'new') document.getElementById('book-discount').value = "0.00";
+        }
+
+        // załadowanie aktualnego stanu magazynu
+        function loadStorage() {
+            const tbody = document.getElementById('tabela-admin-magazyn');
+            tbody.innerHTML = ""; // czyszczenie starych danych
+
+            fetch(`${API_URL}/books/all`)
+                .then(res => res.json())
+                .then(books => {
+                    // dla każdej ksiązki generujemy wyświetlany wiersz
+                    books.forEach(b => {
+
+                        // wybranie odpowiedniej plakietki zależnie od stanu książki
+                        let badge = (b.condition === 'new') ? '<span class="badge bg-success">Nowa</span>' :
+                                    (b.condition === 'used') ? '<span class="badge bg-warning text-dark">Używana</span>' : '<span class="badge bg-danger">Zniszczona</span>';
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>
+                                    <div class="fw-bold">${b.title}</div>
+                                    <div class="text-muted small">${b.author}</div>
+                                </td>
+                                <td>${badge}</td>
+                                <td class="fw-bold">${parseFloat(b.price).toFixed(2)} zł</td>
+                                <td class="text-center">
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteBook(${b.storage_id})">
+                                        <i class="bi bi-trash3"></i> Usuń
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                })
+                .catch(err => console.error(err));
+        }
+
+        // usuwanie ksiązki z magazynu
+        function deleteBook(id) {
+            if(confirm("Czy na pewno chcesz usunąć ten produkt?")) {
+                fetch(`${API_URL}/admin/books/delete/${id}`, { method: 'DELETE' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === "success") {
+                            alert("Produkt został usunięty z magazynu");
+                        } else {
+                            alert("Nie można usunąć tej pozycji");
+                        }
+                        loadStorage();
+                    })
+                    .catch(err => console.error("Błąd:", err));
+            }
+        }
+
+        // dodawanie książki
+        document.getElementById('form-dodaj-ksiazke').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // wartości z formularza spakowane w json
+            const payload = {
+                title: document.getElementById('book-title').value,
+                author: document.getElementById('book-author').value,
+                genre: document.getElementById('book-genre').value,
+                publisher: document.getElementById('book-publisher').value,
+                release_date: document.getElementById('book-date').value,
+                price: document.getElementById('book-price').value,
+                condition: document.getElementById('book-condition').value,
+                discount: document.getElementById('book-discount').value,
+                in_stock: document.getElementById('book-stock').value
+            };
+
+            fetch(`${API_URL}/admin/books/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('form-dodaj-ksiazke').reset(); // wyczyszczenie formularza
+                toggleDiscountField(); // resetowanie widoczności pola rabat
+                alert("Sukces! Książka została poprawnie dodana do bazy i magazynu.");
+            });
+        });
+
+        // dodawanie nowego klienta
+        document.getElementById('form-dodaj-klienta').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // wartości z formularza spakowane w json
+            const payload = {
+                first_name: document.getElementById('cust-first-name').value,
+                last_name: document.getElementById('cust-last-name').value,
+                address: document.getElementById('cust-address').value,
+                phone: document.getElementById('cust-phone').value,
+                email: document.getElementById('cust-email').value
+            };
+
+            fetch(`${API_URL}/admin/customers/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('form-dodaj-klienta').reset(); // czyszczenie formularza
+                alert("Sukces! Nowy klient został zarejestrowany.");
+            });
+        });
+
+        // raport analizy sprzedazy
+        function loadSalesReport() {
+            initReportContainer("Analiza przychodów według kategorii stanu książek");
+            fetch(`${API_URL}/admin/reports/sales-analysis`)
+                .then(res => res.json())
+                .then(data => {
+                    let html = `<thead class="table-dark"><tr><th>Stan książki</th><th>Łączny przychód</th></tr></thead><tbody>`;
+                    // każdy zwrócony wiersz wrzucamy do tabelki
+                    data.forEach(r => {
+                        html += `<tr>
+                                    <td><span class="text-uppercase fw-bold">${r.stan_ksiazki}</span></td>
+                                    <td class="text-success fw-bold">${parseFloat(r.laczny_przychod).toFixed(2)} zł</td></tr>`;
+                    });
+                    document.getElementById('tabela-raportow').innerHTML = html + "</tbody>";
+                });
+        }
+
+        // raport lojalnych klientów
+        function loadLoyaltyReport() {
+            initReportContainer("Ranking TOP 5 klientów");
+
+
+            fetch(`${API_URL}/admin/reports/loyalty`)
+                .then(res => res.json())
+                .then(dane => {
+                    let html = `<thead class="table-dark"><tr><th>Miejsce</th><th>Klient</th><th>Suma wydana</th></tr></thead><tbody>`;
+                    dane.forEach((r, i) => {
+                        html += `<tr><td># ${i+1}</td><td class="fw-bold">${r.first_name} ${r.last_name}</td><td class="text-success fw-bold">${parseFloat(r.suma_wydana).toFixed(2)} zł</td></tr>`;
+                    });
+                    document.getElementById('tabela-raportow').innerHTML = html + "</tbody>";
+                });
+        }
+
+        // wyszukiwanie braków asortymentu poniżej określonego limitu
+        function loadLowStockReport() {
+            const limit = document.getElementById('report-stock-limit').value || 5;
+            initReportContainer(`Książki z krytycznym stanem magazynowym (Mniej niż ${limit} szt.)`);
+            fetch(`${API_URL}/admin/reports/low-stock/${limit}`)
+                .then(res => res.json())
+                .then(data => {
+                    let html = `<thead class="table-dark"><tr><th>Tytuł i Autor</th><th>Stan</th><th>Dostępna ilość</th></tr></thead><tbody>`;
+                    if(data.length === 0) {
+                        html += `<tr><td colspan="3" class="text-center text-muted">Brak pozycji poniżej limitu</td></tr>`;
+                    }
+                    data.forEach(r => {
+                        html += `<tr><td><strong>${r.tytul}</strong><br><small>${r.autor}</small></td><td>${r.stan}</td><td class="text-danger fw-bold">${r.dostepna_ilosc} szt.</td></tr>`;
+                    });
+                    document.getElementById('tabela-raportow').innerHTML = html + "</tbody>";
+                });
+        }
+
+        // funckja pomocnicza dla raportów
+        // czyści tabelki i ustawia odpowiedni tytuł raportu
+        function initReportContainer(title) {
+            document.getElementById('report-title').innerText = title;
+            document.getElementById('tabela-raportow').innerHTML = "";
+            document.getElementById('report-results-wrapper').style.display = 'block';
+        }
+
+
+        loadStorage();
+
+</script>
+
+</body>
+</html>

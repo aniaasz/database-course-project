@@ -113,6 +113,25 @@ def get_regular_books():
             return results
 
 
+def get_all_books():
+    """
+    Pobiera wszystkie książki
+    """
+    with get_connection() as connection:
+        with connection.cursor(pymysql.cursors.DictCursor) as cur:
+            sql = """
+                SELECT s.id AS storage_id,b.title, b.author, b.genre, s.condition, 
+                       COALESCE(b.price - s.discount, b.price) AS price
+                FROM Books b
+                JOIN Storage s ON s.book_id = b.id
+                WHERE s.in_stock > 0
+            """
+            cur.execute(sql)
+            results = cur.fetchall()
+            print(f"Found {len(results)} regular books")
+            return results
+
+
 def get_customer_by_name(first_name, last_name):
     """
     Wyświetla podstawowe dane klienta
@@ -152,7 +171,7 @@ def get_customer_order_history(customer_id):
     with get_connection() as connection:
         with connection.cursor(pymysql.cursors.DictCursor) as cur:
             sql = """
-                SELECT c.first_name, c.last_name, b.title, b.author, s.condition, o.order_date, od.quantity, od.price 
+                SELECT o.id AS order_id, c.first_name, c.last_name, b.title, b.author, s.condition, o.order_date, od.quantity, od.price 
                 FROM Customers c
                 JOIN Orders o ON c.id = o.customer_id
                 JOIN Order_Details od ON od.order_id = o.id
