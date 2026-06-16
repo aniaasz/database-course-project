@@ -19,15 +19,24 @@ def process_order(customer_id, items):
             try:
                 customer_id = int(customer_id)
                 total_amount = 0
+                
+                #Sortowanie koszyka po ID zapobiega zakleszczeniom (deadlocks), gdy klienci kupują te same rzeczy naraz.
+                items = sorted(items, key=lambda item: int(item['storage_id']))
 
                 # Blokada (FOR UPDATE) dla sprawdzanych pozycji.
                 # Zabezpiecza przed problemem race conditions przy równoległych zamówieniach.
                 for item in items:
                     storage_id = int(item['storage_id'])
                     quantity_needed = int(item['quantity'])
-                    price = float(item['price'])
                     
-                    sql_lock = "SELECT in_stock, `condition` FROM Storage WHERE id = %s FOR UPDATE"
+                    #Zmieniamy zapytanie, żeby pobierało bezpieczną cenę prosto z bazy danych (JOIN z Books), zamiast tego co w JSON, bo to może zostać zhackowane przez użytkownika
+                    #dlatego cenę pobieramy bezpośrednio z bazy w momencie składania zamówienia
+                    sql_lock = """
+                        SELECT s.in_stock, s.`condition`, s.discount, b.price 
+                        FROM Storage s 
+                        JOIN Books b ON s.book_id = b.id 
+                        WHERE s.id = %s FOR UPDATE
+                    """
                     cur.execute(sql_lock, (storage_id,))
                     result = cur.fetchone()
 
@@ -35,7 +44,11 @@ def process_order(customer_id, items):
                     if not result or result['in_stock'] < quantity_needed:
                         raise Exception(f"Insufficient stock for storage ID: {storage_id}")
                     
-                    total_amount += (quantity_needed * price)
+                    # Wyliczenie autentycznej ceny po ewentualnych rabatach
+                    real_price = float(result['price']) - float(result['discount'] or 0) #trzeba jeszcze uwzglednić rabat ewentualny
+                    # Zapisuje bezpieczną cenę do słownika, żeby druga pętla mogła jej użyć
+                    item['price'] = real_price
+                    total_amount += (quantity_needed * real_price)
 
                 # Utworzenie głównego rekordu zamówienia (nagłówka)
                 sql_order = "INSERT INTO Orders (customer_id, order_date, total_amount) VALUES (%s, NOW(), %s)"
@@ -46,7 +59,7 @@ def process_order(customer_id, items):
                 for item in items:
                     storage_id = int(item['storage_id'])
                     quantity = int(item['quantity'])
-                    price = float(item['price'])
+                    price = float(item['price']) # Teraz to bezpiecznie pobiera real_price
 
                     sql_details = """
                         INSERT INTO Order_Details (order_id, storage_id, quantity, price) 
