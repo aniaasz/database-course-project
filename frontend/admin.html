@@ -308,6 +308,7 @@
             .then(data => {
                 document.getElementById('form-dodaj-ksiazke').reset(); // wyczyszczenie formularza
                 toggleDiscountField(); // resetowanie widoczności pola rabat
+                alert("Sukces! Książka została poprawnie dodana do bazy i magazynu.");
             });
         });
 
@@ -332,6 +333,7 @@
             .then(res => res.json())
             .then(data => {
                 document.getElementById('form-dodaj-klienta').reset(); // czyszczenie formularza
+                alert("Sukces! Nowy klient został zarejestrowany.");
             });
         });
 
