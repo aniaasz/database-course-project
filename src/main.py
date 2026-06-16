@@ -223,15 +223,17 @@ def api_report_loyalty():
 
 
 if __name__ == '__main__':
-    #Domyślne dane na wypadek stresu podczas prezentacji :)
+    #Domyślne dane 
     DEFAULT_CUSTOMER_ID = 1
     DEFAULT_ITEMS = [
         {'storage_id': 1, 'quantity': 1},
         {'storage_id': 2, 'quantity': 2}
     ]
-
+    
     # Sprawdzamy, czy uruchamiamy skrypt z argumentami (do prezentacji w terminalu)
     if len(sys.argv) > 1:
+        #przykładowe uruchomienie:
+        #python main.py process_order 1 2
         try:
             nazwa_funkcji = sys.argv[1]# Pierwszy argument po nazwie pliku to nazwa funkcji, np. "process_order"
             if nazwa_funkcji == "process_order":
