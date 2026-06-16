@@ -35,7 +35,7 @@ Frontend: HTML, JavaScript
    * Otwórz plik `index.html` (znajdujący się w folderze frontendu) bezpośrednio w dowolnej przeglądarce internetowej.
   
 5. **Uruchomienie transakcji i dodanie zamówienia:**
-   * Otwórz terminal w głównym folderze projektu i zainstaluj wymagane pakiety:
+   * Otwórz terminal w głównym folderze projektu:
 ```bash
      python main.py process_order [Id_klienta] [ID pozycji magazynowej / egzemplarza do kupienia]
 ```
