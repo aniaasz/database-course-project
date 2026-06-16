@@ -9,8 +9,6 @@ Księgarnia internetowa, w której użytkownicy mogą kupować książki w dwóc
 * **Regularne (Nowe):** Fabrycznie nowe książki w standardowych cenach.
 * **Outlet:** Książki lekko uszkodzone lub używane, sprzedawane ze zniżką.
 
-Aplikacja to pełnoprawny system Full-Stack z podziałem na role (Klient / Administrator), systemem raportowym oraz zarządzaniem stanami magazynowymi.
-
 ## 💻 Technologie
 Backend: Python, Flask, PyMySQL
 
@@ -18,31 +16,11 @@ Baza danych: MySQL
 
 Frontend: HTML, JavaScript
 
-## 🚀 Funkcjonalności
-
-### Dla Klienta:
-* **Przeglądanie katalogu:** Podział asortymentu na książki nowe oraz outletowe (używane, zniszczone).
-* **Wyszukiwarka:** Możliwość szybkiego wyszukiwania książek po tytule lub autorze.
-* **Profil Użytkownika:** Podgląd profilu klienta z formularzem umożliwiającym edycję danych kontaktowych.
-* **Historia Zamówień:** Szczegółowy wykaz zrealizowanych zakupów z automatycznie przeliczanymi kwotami i tłumaczeniem stanów fizycznych książek.
-
-### Dla Administratora (Panel Admina):
-* **Zarządzanie asortymentem (CRUD):** Dodawanie nowych tytułów do bazy oraz przypisywanie ich do fizycznego magazynu, wraz z bezpiecznym usuwaniem asortymentu.
-* **Rejestracja klientów:** Dodawanie nowych użytkowników do systemu.
-* **System Raportowy:** możliwość tworzenia różnych raportów. 
----
-
-## ⚙️ Użyte mechaniki bazodanowe i architektoniczne
-* **Transakcje i reguły ACID:** Zastosowanie mechanizmów blokowania (`FOR UPDATE`) oraz kontroli transakcji (`connection.rollback()` i `commit()`) w celu zapobiegania "race conditions" podczas modyfikacji danych.
-* **Ochrona przed SQL Injection:** Pełna parametryzacja zapytań bazodanowych (wykorzystanie `%s` przy przekazywaniu danych wprowadzanych przez użytkowników).
-* **Architektura REST API:** Wyraźny podział logiki na interfejs sieciowy (`main.py`), operacje bazodanowe (`crud_operations.py`) i agregację danych analitycznych (`reports.py`).
-
 ---
 
 ## 🛠 Instrukcja uruchomienia
 
 1. **Konfiguracja Bazy Danych:**
-   * Zaimportuj pliki `schema.sql` oraz `data.sql` do swojego serwera MySQL (np. za pomocą MySQL Workbench).
    * Skonfiguruj parametry połączenia z bazą (host, user, password) w pliku `db_config.py`.
 2. **Instalacja zależności Backendowych:**
    * Otwórz terminal w głównym folderze projektu i zainstaluj wymagane pakiety:
@@ -126,33 +104,24 @@ Interfejs stworzony w **HTML** wspieranym przez skrypty **JavaScript**. Do uzysk
     - możliwość wysuzkiwania ksiązek po autorze/ tytule
     - podsumowanie, dostępnych tytułów, ilość książek w putlecie i ile jest zamówień
     - sekcja top 3 najczęściej zamawianych książek z odnośnikiem do danej książki
- <img width="752" height="493" alt="image" src="https://github.com/user-attachments/assets/81678d59-38bb-4112-ab03-6de26dfc4795" />
     
 + **Sekcje wyświetlania książek**
     Podstrony na których możemy wyświetlić wszystkie książki lub z konkretnej kategorii
-  <img width="1542" height="592" alt="image" src="https://github.com/user-attachments/assets/df5b3195-d975-4120-9e0f-463c683403f0" />
 
 + **Profil**
     Przykładowy widok profilu zalogowanego użytkownika (Klient nr 1), umożliwiający:
      - zobaczenia danych klienta
      - zmienić jakieś dane
      - zobaczyć historię zamówień klienta
-  <img width="983" height="707" alt="image" src="https://github.com/user-attachments/assets/61363cca-ecf0-47ca-af43-2d9cecb322f4" />
 
 + **Panel admina** (podzielony na cztery kafelki)
     - Stany magazynu: widzimy jakie ksiązki mamy w jakim stanie i ile kosztują, można usunąć jakąś z magazynu
     - Dodaj książkę: formularz dzięki któremy możemy dodać jakąś książkę do bazy
     - Zarejestruj klienta: folmularz dzięki któremy możemy dodać klienta do bazy
     - Raporty i analizy: możliwość wyświetlenia przychodów, lojalnych klientów i braków magazynowych
-<img width="1156" height="623" alt="image" src="https://github.com/user-attachments/assets/904a5e7b-d859-47ad-be68-fca140925aa5" />
 
-<img width="1146" height="757" alt="image" src="https://github.com/user-attachments/assets/3ed443f6-03db-4013-8c20-29c390c07c33" />
-
- <img width="436" height="222" alt="image" src="https://github.com/user-attachments/assets/1eae1612-55f9-460c-b957-ddb5fb340ffe" />
-<img width="1601" height="772" alt="image" src="https://github.com/user-attachments/assets/4f696596-f87d-48b3-a686-0ae25c522085" />
-<img width="735" height="386" alt="image" src="https://github.com/user-attachments/assets/44bbcb31-3f4b-47da-9c76-b20b308e8d85" />
-<img width="795" height="777" alt="image" src="https://github.com/user-attachments/assets/906fc962-50e3-44ff-9ce3-98435783c718" />
-<img width="1202" height="431" alt="image" src="https://github.com/user-attachments/assets/d297d37f-4eaa-4796-a7ad-86bfb36fbad7" />
+Plik ze szczegółową wizualizacją strony:
+[Bd.pdf](https://github.com/user-attachments/files/29023823/Bd.pdf)
 
 ---
 
@@ -232,4 +201,6 @@ process_order(customer_id, items) - Proces Zakupu wykonuje pełny cykl zamówien
   `[ {'storage_id': 1, 'quantity': 2, 'price': 39.99},{'storage_id': 4, 'quantity': 1, 'price': 24.50}]`
 - return - ID utworzonego zamówienia w przypadku sukcesu, False w przypadku błędu
 
-testowanie: wywołaj python main.py process_order [ID_KLIENTA] [ID_ORDERU]
+testowanie: wywołaj python main.py process_order [Id_klienta] [ID pozycji magazynowej / egzemplarza do kupienia]
+<img width="600" height="120" alt="image" src="https://github.com/user-attachments/assets/7a06cd13-8700-4411-bda0-d0b1929b50cb" />
+
