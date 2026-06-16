@@ -160,10 +160,7 @@
             // dla każdego zamówienia
             orders.forEach(ord => {
                 // ustawienie koloru plakeitni zależnego od stanu książki
-                let conditionBadge = "";
-                if(ord.condition === 'new') conditionBadge = '<span class="badge bg-success">Nowa</span>';
-                else if(ord.condition === 'used') conditionBadge = '<span class="badge bg-warning text-dark">Używana</span>';
-                else conditionBadge = '<span class="badge bg-danger">Zniszczona</span>';
+                let conditionBadge = ord.condition === "new" ? "bg-success" : "bg-warning text-dark";
                 
                 // łączna kwota całego zamówienia
                 let price = (ord.price * ord.quantity).toFixed(2);
@@ -173,7 +170,7 @@
                         <td>#${ord.order_id}</td>
                         <td><small class="text-muted">${ord.order_date}</small></td>
                         <td class="fw-bold">${ord.title}</td>
-                        <td>${conditionBadge}</td>
+                        <td><span class="badge ${conditionBadge}">${ord.condition}</span></td>
                         <td class="text-primary fw-bold">${price}</td>
                     </tr>
                 `;
