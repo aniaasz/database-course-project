@@ -11,7 +11,9 @@ Księgarnia internetowa, w której użytkownicy mogą kupować książki w dwóc
 
 ## 💻 Technologie
 Backend: Python
+
 Baza danych: MySQL
+
 Frontend: HTML, JavaScript
 
 ---
