@@ -22,22 +22,17 @@ Frontend: HTML, JavaScript
 
 ### Dla Klienta:
 * **Przeglądanie katalogu:** Podział asortymentu na książki nowe oraz outletowe (używane, zniszczone).
-* **Dynamiczna wyszukiwarka:** Możliwość szybkiego wyszukiwania książek po tytule lub autorze.
-* **Profil Użytkownika:** Podgląd profilu klienta z dynamicznym formularzem umożliwiającym edycję danych kontaktowych.
+* **Wyszukiwarka:** Możliwość szybkiego wyszukiwania książek po tytule lub autorze.
+* **Profil Użytkownika:** Podgląd profilu klienta z formularzem umożliwiającym edycję danych kontaktowych.
 * **Historia Zamówień:** Szczegółowy wykaz zrealizowanych zakupów z automatycznie przeliczanymi kwotami i tłumaczeniem stanów fizycznych książek.
 
 ### Dla Administratora (Panel Admina):
 * **Zarządzanie asortymentem (CRUD):** Dodawanie nowych tytułów do bazy oraz przypisywanie ich do fizycznego magazynu, wraz z bezpiecznym usuwaniem asortymentu.
 * **Rejestracja klientów:** Dodawanie nowych użytkowników do systemu.
-* **System Raportowy:**
-  * Analiza przychodów wg stanu książek.
-  * Raport lojalnościowy (TOP 5 klientów z największą sumą zamówień).
-  * Alert krytycznych stanów magazynowych (wyszukiwanie braków asortymentu).
-
+* **System Raportowy:** możliwość tworzenia różnych raportów. 
 ---
 
-## ⚙️ Zaawansowane mechaniki bazodanowe i architektoniczne
-Projekt został zbudowany z zachowaniem profesjonalnych praktyk inżynieryjnych:
+## ⚙️ Użyte mechaniki bazodanowe i architektoniczne
 * **Transakcje i reguły ACID:** Zastosowanie mechanizmów blokowania (`FOR UPDATE`) oraz kontroli transakcji (`connection.rollback()` i `commit()`) w celu zapobiegania "race conditions" podczas modyfikacji danych.
 * **Ochrona przed SQL Injection:** Pełna parametryzacja zapytań bazodanowych (wykorzystanie `%s` przy przekazywaniu danych wprowadzanych przez użytkowników).
 * **Architektura REST API:** Wyraźny podział logiki na interfejs sieciowy (`main.py`), operacje bazodanowe (`crud_operations.py`) i agregację danych analitycznych (`reports.py`).
@@ -131,19 +126,34 @@ Interfejs stworzony w **HTML** wspieranym przez skrypty **JavaScript**. Do uzysk
     - możliwość wysuzkiwania ksiązek po autorze/ tytule
     - podsumowanie, dostępnych tytułów, ilość książek w putlecie i ile jest zamówień
     - sekcja top 3 najczęściej zamawianych książek z odnośnikiem do danej książki
+ <img width="752" height="493" alt="image" src="https://github.com/user-attachments/assets/81678d59-38bb-4112-ab03-6de26dfc4795" />
+    
 + **Sekcje wyświetlania książek**
     Podstrony na których możemy wyświetlić wszystkie książki lub z konkretnej kategorii
+  <img width="1542" height="592" alt="image" src="https://github.com/user-attachments/assets/df5b3195-d975-4120-9e0f-463c683403f0" />
+
 + **Profil**
     Przykładowy widok profilu zalogowanego użytkownika (Klient nr 1), umożliwiający:
      - zobaczenia danych klienta
      - zmienić jakieś dane
      - zobaczyć historię zamówień klienta
+  <img width="983" height="707" alt="image" src="https://github.com/user-attachments/assets/61363cca-ecf0-47ca-af43-2d9cecb322f4" />
+
 + **Panel admina** (podzielony na cztery kafelki)
     - Stany magazynu: widzimy jakie ksiązki mamy w jakim stanie i ile kosztują, można usunąć jakąś z magazynu
     - Dodaj książkę: formularz dzięki któremy możemy dodać jakąś książkę do bazy
     - Zarejestruj klienta: folmularz dzięki któremy możemy dodać klienta do bazy
     - Raporty i analizy: możliwość wyświetlenia przychodów, lojalnych klientów i braków magazynowych
-  
+<img width="1156" height="623" alt="image" src="https://github.com/user-attachments/assets/904a5e7b-d859-47ad-be68-fca140925aa5" />
+
+<img width="1146" height="757" alt="image" src="https://github.com/user-attachments/assets/3ed443f6-03db-4013-8c20-29c390c07c33" />
+
+ <img width="436" height="222" alt="image" src="https://github.com/user-attachments/assets/1eae1612-55f9-460c-b957-ddb5fb340ffe" />
+<img width="1601" height="772" alt="image" src="https://github.com/user-attachments/assets/4f696596-f87d-48b3-a686-0ae25c522085" />
+<img width="735" height="386" alt="image" src="https://github.com/user-attachments/assets/44bbcb31-3f4b-47da-9c76-b20b308e8d85" />
+<img width="795" height="777" alt="image" src="https://github.com/user-attachments/assets/906fc962-50e3-44ff-9ce3-98435783c718" />
+<img width="1202" height="431" alt="image" src="https://github.com/user-attachments/assets/d297d37f-4eaa-4796-a7ad-86bfb36fbad7" />
+
 ---
 
 ### Warstwa serwerowa
@@ -207,7 +217,19 @@ Część serwerowa została napisana przy użyciu frameworka **Flask**
 ---
 
 ## Raporty
-
+- `get_sales_analysis():` - Analiza sprzedaży. Łączy szczegóły zamówień z magazynem, grupuje po stanie książki i sumuje przychód (ilość * cena) osobno dla 'new', 'used' i 'damaged'.
+- `get_loyalty_report():` - Raport "lojalnościowy" klientów (kto ile wydał). Łączy klientów z ich zamówieniami, sumuje wydane kwoty, sortuje od największej wartości i zwraca TOP 5 najlepszych klientów.
+- `get_low_stock_status(limit_x):` - Status magazynowy (Alert niskiego stanu). Wyszukuje pozycje, których liczba sztuk w magazynie spadła poniżej podanej wartości X.Dzięki temu menedżer wie, co trzeba pilnie domówić.
+- `get_total_profits():` - Całkowite zyski księgarni. Sumuje całkowity historyczny przychód ze wszystkich zrealizowanych pozycji zamówień.
+- `get_top_selling_books(limit=5):` - Najczęściej kupowane tytuły (Bestsellery). Zlicza łączną liczbę sprzedanych egzemplarzy dla każdego tytułu i zwraca najpopularniejsze.
+- `get_full_warehouse_stock():` - Aktualny stan magazynowy (Pełny wykaz). Pokazuje wszystkie dostępne książki w magazynie (ilość > 0) z podziałem na ich stan.
 ---
 
 ## Transakcja
+process_order(customer_id, items) - Proces Zakupu wykonuje pełny cykl zamówienia w jednej transakcji z blokadą wierszy (obsługa współbieżności).
+- customer_id - ID klienta składającego zamówienie (int)
+- items - Lista słowników z koszykiem zakupowym
+  `[ {'storage_id': 1, 'quantity': 2, 'price': 39.99},{'storage_id': 4, 'quantity': 1, 'price': 24.50}]`
+- return - ID utworzonego zamówienia w przypadku sukcesu, False w przypadku błędu
+
+testowanie: wywołaj python main.py process_order [ID_KLIENTA] [ID_ORDERU]
