@@ -233,7 +233,7 @@ if __name__ == '__main__':
     # Sprawdzamy, czy uruchamiamy skrypt z argumentami (do prezentacji w terminalu)
     if len(sys.argv) > 1:
         #przykładowe uruchomienie:
-        #python main.py process_order 1 2
+        #python main.py process_order 1 5
         try:
             nazwa_funkcji = sys.argv[1]# Pierwszy argument po nazwie pliku to nazwa funkcji, np. "process_order"
             if nazwa_funkcji == "process_order":
@@ -258,7 +258,7 @@ if __name__ == '__main__':
                 print(f"Nieznana funkcja: {nazwa_funkcji}. Dostepne: process_order")
 
         except Exception as e:
-            print(f"Wystapil blad podczas prezentacji: {e}")   
+            print(f"Wystapil blad: {e}")   
     else: # Jeśli ktoś odpali program bez argumentów (zwykłe python main.py)
         # uruchomienie aplikacji w trybie debug aby łatwiej wyłapywać błędy
         # serwer słucha na porcie 5000
