@@ -120,7 +120,7 @@ def get_all_books():
     with get_connection() as connection:
         with connection.cursor(pymysql.cursors.DictCursor) as cur:
             sql = """
-                SELECT b.title, b.author, b.genre, s.condition, 
+                SELECT s.id AS storage_id,b.title, b.author, b.genre, s.condition, 
                        COALESCE(b.price - s.discount, b.price) AS price
                 FROM Books b
                 JOIN Storage s ON s.book_id = b.id

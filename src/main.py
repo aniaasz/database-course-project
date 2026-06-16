@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-
 from crud_operations import (
     get_customer_by_name, get_customer_order_history, update_customer_contact,
-    get_regular_books, get_outlet_books, get_all_books
+    get_regular_books, get_outlet_books, get_all_books,
+    delete_storage_item, register_client, add_book_to_storage, create_book
+)
+from reports import (
+    get_top_selling_books, get_loyalty_report, get_low_stock_status, get_sales_analysis
 )
 
 # inicjalizacja aplikacji
@@ -92,6 +95,17 @@ def api_all_books():
         return jsonify({"error": str(e)}), 500
 
 
+# TOP 3 najlepiej sprzedające się książki
+@app.route('/api/books/bestsellers', methods=['GET'])
+def api_get_bestsellers():
+    try:
+        # pobieramy raport najlepiej sprzedających się książek ustawiając limit na 3
+        bestsellery = get_top_selling_books(limit=3)
+        return jsonify(bestsellery), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 # ENDPOINT STATYSTYK
 
 
@@ -122,6 +136,89 @@ def api_get_stats():
                     "outlet": res_outlet['total_outlet'] if res_outlet else 0,
                     "orders": res_orders['total_orders'] if res_orders else 0
                 }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ENDPOINTY DLA ADMINA
+
+# dodawanie nowej książki i wrzucanie jej na magazyn
+@app.route('/api/admin/books/add', methods=['POST'])
+def api_admin_add_book():
+    data = request.get_json()
+    try:
+        book_id = create_book(
+            tytul=data.get('title'),
+            autor=data.get('author'),
+            gatunek=data.get('genre'),
+            wydawnictwo=data.get('publisher'),
+            data_wydania=data.get('release_date'),
+            cena=float(data.get('price'))
+        )
+        add_book_to_storage(
+            id_ksiazki=book_id,
+            stan_produktu=data.get('condition'),
+            ilosc=int(data.get('in_stock')),
+            rabat=float(data.get('discount', 0))
+        )
+        return jsonify({"status": "success"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# rejestracja nowego klienta
+@app.route('/api/admin/customers/add', methods=['POST'])
+def api_admin_add_customer():
+    data = request.get_json()
+    try:
+        customer_id = register_client(
+            imie=data.get('first_name'),
+            nazwisko=data.get('last_name'),
+            adres=data.get('address'),
+            telefon=data.get('phone'),
+            email=data.get('email')
+        )
+        return jsonify(customer_id), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# usuwanie książki z magazynu
+@app.route('/api/admin/books/delete/<int:storage_id>', methods=['DELETE'])
+def api_admin_delete_book(storage_id):
+    try:
+        res = delete_storage_item(storage_id)
+        if res:
+            return jsonify({"status": "success"}), 200
+        else:
+            return jsonify({"status": "error"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# wyciąga raport analizy sprzedazy
+@app.route('/api/admin/reports/sales-analysis', methods=['GET'])
+def api_report_sales():
+    try:
+        return jsonify(get_sales_analysis()), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# wyciąga raport niskiego stanu magazynoweog
+@app.route('/api/admin/reports/low-stock/<int:limit>', methods=['GET'])
+def api_report_low_stock(limit):
+    try:
+        return jsonify(get_low_stock_status(limit)), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# wyciąga raport top 5 klientów
+@app.route('/api/admin/reports/loyalty', methods=['GET'])
+def api_report_loyalty():
+    try:
+        return jsonify(get_loyalty_report()), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

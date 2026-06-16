@@ -151,7 +151,52 @@
                 });
         }
 
+        function loadBestsellers(){
+            const table = document.getElementById('bestsellery-kontener');
+            table.innerHTML = "";
+
+            fetch(`${API_URL}/books/bestsellers`)
+                .then(response => response.json())
+                .then(bestSellers => {
+                    if (!bestSellers || bestSellers.length === 0) {
+                        table.innerHTML = `<div class="col-12 text-center text-muted">Brak danych</div>`;
+                        return;
+                    }
+
+                    // dla każdej książki tworzymy kartę
+                    bestSellers.forEach((book,i) => {
+
+
+                        table.innerHTML += `
+                            <div class="col">
+                                <div class="card h-100 shadow-sm border-0 bg-white">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold text-dark mb-1">${book.title}</h5>
+                                        <p class="card-text text-muted small mb-3">Autor: ${book.author}</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-light text-success border border-success-subtle px-2 py-1">
+                                                Sprzedano: <strong>${book.total_sold} szt.</strong>
+                                            </span>
+                                            <a href="./books.html?search=${encodeURIComponent(book.title)}" class="btn btn-sm btn-outline-primary">
+                                                Zobacz dostępność
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                    })
+
+                })
+                .catch(err => {
+                    console.error("Błąd ładowania bestsellerów:", err);
+                });
+
+        }
+
         loadStats();
+        loadBestsellers();
 
     </script>
 </body>

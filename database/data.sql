@@ -34,3 +34,7 @@ ON DUPLICATE KEY UPDATE id=id;
 INSERT INTO Storage (id, book_id, `condition`, in_stock, discount)
 VALUES (6, 6, 'used', 7, 14.00)
 ON DUPLICATE KEY UPDATE id=id;
+
+
+-- dodany Jan Nowak przez panel admina
+-- dodana testowa książka (wszystkie dane test) która była potem usunięta więc jest w books ale ze storage zniknęła
