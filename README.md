@@ -33,6 +33,13 @@ Frontend: HTML, JavaScript
    * Serwer nasłuchuje lokalnie na porcie 5000 (`http://127.0.0.1:5000`).
 4. **Uruchomienie Frontendu:**
    * Otwórz plik `index.html` (znajdujący się w folderze frontendu) bezpośrednio w dowolnej przeglądarce internetowej.
+  
+5. **Uruchomienie transakcji i dodanie zamówienia:**
+   * Otwórz terminal w głównym folderze projektu i zainstaluj wymagane pakiety:
+```bash
+     python main.py process_order [Id_klienta] [ID pozycji magazynowej / egzemplarza do kupienia]
+```
+<img width="600" height="120" alt="image" src="https://github.com/user-attachments/assets/7a06cd13-8700-4411-bda0-d0b1929b50cb" />
 
 ---
 
@@ -197,13 +204,4 @@ Część serwerowa została napisana przy użyciu frameworka **Flask**
 - `items` - Lista słowników z koszykiem zakupowym
   `[ {'storage_id': 1, 'quantity': 2, 'price': 39.99},{'storage_id': 4, 'quantity': 1, 'price': 24.50}]`
 - `return` ID utworzonego zamówienia w przypadku sukcesu, False w przypadku błędu
-
-testowanie: 
-- Wystartuj aplikację backendową poleceniem:
-     ```bash
-     python main.py
-     ```
-     Serwer nasłuchuje lokalnie na porcie 5000 (`http://127.0.0.1:5000`).
-- wywołaj `python main.py process_order [Id_klienta] [ID pozycji magazynowej / egzemplarza do kupienia]`
-<img width="600" height="120" alt="image" src="https://github.com/user-attachments/assets/7a06cd13-8700-4411-bda0-d0b1929b50cb" />
 
