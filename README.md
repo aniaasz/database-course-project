@@ -39,7 +39,7 @@ Frontend: HTML, JavaScript
 ```bash
      python main.py process_order [Id_klienta] [ID pozycji magazynowej / egzemplarza do kupienia]
 ```
-<img width="600" height="120" alt="image" src="https://github.com/user-attachments/assets/7a06cd13-8700-4411-bda0-d0b1929b50cb" />
+
 
 ---
 
@@ -204,4 +204,4 @@ Część serwerowa została napisana przy użyciu frameworka **Flask**
 - `items` - Lista słowników z koszykiem zakupowym
   `[ {'storage_id': 1, 'quantity': 2, 'price': 39.99},{'storage_id': 4, 'quantity': 1, 'price': 24.50}]`
 - `return` ID utworzonego zamówienia w przypadku sukcesu, False w przypadku błędu
-
+<img width="600" height="120" alt="image" src="https://github.com/user-attachments/assets/7a06cd13-8700-4411-bda0-d0b1929b50cb" />
