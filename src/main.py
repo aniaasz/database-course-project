@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from transaction_logic import process_order
 
 from crud_operations import (
     get_customer_by_name, get_customer_order_history, update_customer_contact,
@@ -16,7 +17,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-# ENDPOINTY DLA KLIENTA
+# -----------------ENDPOINTY DLA KLIENTA
 
 # pobiera historię zamówień dla danego klienta
 @app.route('/api/customer/<int:customer_id>/history', methods=['GET'])
@@ -61,9 +62,30 @@ def api_update_customer(customer_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# składanie nowego zamówienia (Checkout)
+@app.route('/api/orders/place', methods=['POST'])
+def api_place_order():
+    data = request.get_json() # Pobieramy koszyk wysłany przez JS
+    try:
+        customer_id = data.get('customer_id')
+        items = data.get('items')
+        
+        # zabezpieczenie, żeby ktoś nie wysłał pustego koszyka
+        if not customer_id or not items or len(items) == 0:
+            return jsonify({"error": "Missing customer_id or empty cart"}), 400
+            
+        # Wywołujemy transakcje
+        order_id = process_order(customer_id, items)
+        if order_id:
+            return jsonify({"status": "success", "order_id": order_id}), 201 # Jeśli się udało, zwracamy ID zamówienia ze statusem 201 (Created)
+        else:
+            return jsonify({"error": "Transaction failed. Check stock availability."}), 400 # Jeśli funkcja zwróciła False (brak w magazynie lub błąd)
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-# ENDPOINTY DLA KSIĄŻEK
 
+# ------------ENDPOINTY DLA KSIĄŻEK
 
 # pobiera tylko nowe książki
 @app.route('/api/books/regular', methods=['GET'])
@@ -106,8 +128,7 @@ def api_get_bestsellers():
         return jsonify({"error": str(e)}), 500
 
 
-# ENDPOINT STATYSTYK
-
+# ------------------ENDPOINT STATYSTYK
 
 # zbiera i updateuje statystyki wyświetlane na stronie głównej
 @app.route('/api/stats', methods=['GET'])
@@ -140,7 +161,7 @@ def api_get_stats():
         return jsonify({"error": str(e)}), 500
 
 
-# ENDPOINTY DLA ADMINA
+# -----------ENDPOINTY DLA ADMINA
 
 # dodawanie nowej książki i wrzucanie jej na magazyn
 @app.route('/api/admin/books/add', methods=['POST'])
