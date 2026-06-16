@@ -10,10 +10,8 @@ Księgarnia internetowa, w której użytkownicy mogą kupować książki w dwóc
 * **Outlet:** Książki lekko uszkodzone lub używane, sprzedawane ze zniżką.
 
 ## 💻 Technologie
-Backend: Python, Flask, PyMySQL
-
+Backend: Python
 Baza danych: MySQL
-
 Frontend: HTML, JavaScript
 
 ---
@@ -21,7 +19,7 @@ Frontend: HTML, JavaScript
 ## 🛠 Instrukcja uruchomienia
 
 1. **Konfiguracja Bazy Danych:**
-   * Skonfiguruj parametry połączenia z bazą (host, user, password) w pliku `db_config.py`.
+   * Skonfiguruj parametry połączenia z bazą (host, user, password) w pliku `.env`.
 2. **Instalacja zależności Backendowych:**
    * Otwórz terminal w głównym folderze projektu i zainstaluj wymagane pakiety:
      ```bash
@@ -98,15 +96,14 @@ Tabela łącząca (wiele-do-wielu) zamówienia z konkretnymi pozycjami na magazy
 ###  Warstwa wizualna
 Interfejs stworzony w **HTML** wspieranym przez skrypty **JavaScript**. Do uzyskania estetycznego wyglądu oraz wyświetlania ikon wykorzystany został framework **Bootstrap**.
 
-
 **Co zawiera frontend:**
 + **Strona główna**
-    - możliwość wysuzkiwania ksiązek po autorze/ tytule
-    - podsumowanie, dostępnych tytułów, ilość książek w putlecie i ile jest zamówień
+    - możliwość wyszukiwania ksiązek po autorze/ tytule
+    - podsumowanie, dostępnych tytułów, ilość książek w outlecie i ile jest zamówień
     - sekcja top 3 najczęściej zamawianych książek z odnośnikiem do danej książki
     
 + **Sekcje wyświetlania książek**
-    Podstrony na których możemy wyświetlić wszystkie książki lub z konkretnej kategorii
+    Podstrony na których możemy wyświetlić wszystkie książki lub z konkretnej kategorii.
 
 + **Profil**
     Przykładowy widok profilu zalogowanego użytkownika (Klient nr 1), umożliwiający:
@@ -186,21 +183,27 @@ Część serwerowa została napisana przy użyciu frameworka **Flask**
 ---
 
 ## Raporty
-- `get_sales_analysis():` - Analiza sprzedaży. Łączy szczegóły zamówień z magazynem, grupuje po stanie książki i sumuje przychód (ilość * cena) osobno dla 'new', 'used' i 'damaged'.
-- `get_loyalty_report():` - Raport "lojalnościowy" klientów (kto ile wydał). Łączy klientów z ich zamówieniami, sumuje wydane kwoty, sortuje od największej wartości i zwraca TOP 5 najlepszych klientów.
-- `get_low_stock_status(limit_x):` - Status magazynowy (Alert niskiego stanu). Wyszukuje pozycje, których liczba sztuk w magazynie spadła poniżej podanej wartości X.Dzięki temu menedżer wie, co trzeba pilnie domówić.
-- `get_total_profits():` - Całkowite zyski księgarni. Sumuje całkowity historyczny przychód ze wszystkich zrealizowanych pozycji zamówień.
-- `get_top_selling_books(limit=5):` - Najczęściej kupowane tytuły (Bestsellery). Zlicza łączną liczbę sprzedanych egzemplarzy dla każdego tytułu i zwraca najpopularniejsze.
-- `get_full_warehouse_stock():` - Aktualny stan magazynowy (Pełny wykaz). Pokazuje wszystkie dostępne książki w magazynie (ilość > 0) z podziałem na ich stan.
++ `get_sales_analysis():` - Analiza sprzedaży. Łączy szczegóły zamówień z magazynem, grupuje po stanie książki i sumuje przychód (ilość * cena) osobno dla 'new', 'used' i 'damaged'.
++ `get_loyalty_report():` - Raport "lojalnościowy" klientów (kto ile wydał). Łączy klientów z ich zamówieniami, sumuje wydane kwoty, sortuje od największej wartości i zwraca TOP 5 najlepszych klientów.
++ `get_low_stock_status(limit_x):` - Status magazynowy (Alert niskiego stanu). Wyszukuje pozycje, których liczba sztuk w magazynie spadła poniżej podanej wartości X.Dzięki temu menedżer wie, co trzeba pilnie domówić.
++ `get_total_profits():` - Całkowite zyski księgarni. Sumuje całkowity historyczny przychód ze wszystkich zrealizowanych pozycji zamówień.
++ `get_top_selling_books(limit=5):` - Najczęściej kupowane tytuły (Bestsellery). Zlicza łączną liczbę sprzedanych egzemplarzy dla każdego tytułu i zwraca najpopularniejsze.
++ `get_full_warehouse_stock():` - Aktualny stan magazynowy (Pełny wykaz). Pokazuje wszystkie dostępne książki w magazynie (ilość > 0) z podziałem na ich stan.
 ---
 
 ## Transakcja
-process_order(customer_id, items) - Proces Zakupu wykonuje pełny cykl zamówienia w jednej transakcji z blokadą wierszy (obsługa współbieżności).
-- customer_id - ID klienta składającego zamówienie (int)
-- items - Lista słowników z koszykiem zakupowym
+**process_order(customer_id, items)** - Proces Zakupu wykonuje pełny cykl zamówienia w jednej transakcji z blokadą wierszy (obsługa współbieżności).
+- `customer_id` - ID klienta składającego zamówienie (int)
+- `items` - Lista słowników z koszykiem zakupowym
   `[ {'storage_id': 1, 'quantity': 2, 'price': 39.99},{'storage_id': 4, 'quantity': 1, 'price': 24.50}]`
-- return - ID utworzonego zamówienia w przypadku sukcesu, False w przypadku błędu
+- `return` ID utworzonego zamówienia w przypadku sukcesu, False w przypadku błędu
 
-testowanie: wywołaj python main.py process_order [Id_klienta] [ID pozycji magazynowej / egzemplarza do kupienia]
+testowanie: 
+- Wystartuj aplikację backendową poleceniem:
+     ```bash
+     python main.py
+     ```
+     Serwer nasłuchuje lokalnie na porcie 5000 (`http://127.0.0.1:5000`).
+- wywołaj `python main.py process_order [Id_klienta] [ID pozycji magazynowej / egzemplarza do kupienia]`
 <img width="600" height="120" alt="image" src="https://github.com/user-attachments/assets/7a06cd13-8700-4411-bda0-d0b1929b50cb" />
 
