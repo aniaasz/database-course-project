@@ -121,7 +121,7 @@ Interfejs stworzony w **HTML** wspieranym przez skrypty **JavaScript**. Do uzysk
     - Raporty i analizy: możliwość wyświetlenia przychodów, lojalnych klientów i braków magazynowych
 
 Plik ze szczegółową wizualizacją strony:
-[Bd.pdf](https://github.com/user-attachments/files/29023823/Bd.pdf)
+[Ksiegarnia.pdf](https://github.com/user-attachments/files/29023965/Ksiegarnia.pdf)
 
 ---
 
