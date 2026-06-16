@@ -61,6 +61,7 @@
                             <th>Tytuł</th>
                             <th>Autor</th>
                             <th>Gatunek</th>
+                            <th>Wydawnictwo</th>
                             <th>Stan</th>
                             <th>Cena</th>
                         </tr>
@@ -88,6 +89,7 @@
         table.innerHTML = "";
 
         // dobór adresu api zależnego od kategorii
+        let endpointUrl;//bez tego nie we wszystkich wersjach przeglądarek (Strict JS przejdzie)
         if (category === 'used') {
             endpointUrl = `${API_URL}/books/outlet/used`;
         } else if (category === 'damaged') {
@@ -132,6 +134,7 @@
                         <td class="fw-bold">${k.title}</td>
                         <td>${k.author}</td>
                         <td><span class="badge bg-secondary">${k.genre}</span></td>
+                        <td>${k.publisher}</td>
                         <td>${stanBadge}</td>
                         <td class="text-danger fw-bold">${price}</td>
                     </tr>
