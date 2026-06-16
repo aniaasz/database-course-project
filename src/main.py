@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from transaction_logic import process_order
+import sys
 
 from crud_operations import (
     get_customer_by_name, get_customer_order_history, update_customer_contact,
@@ -16,7 +18,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-# ENDPOINTY DLA KLIENTA
+# -----------------ENDPOINTY DLA KLIENTA
 
 # pobiera historię zamówień dla danego klienta
 @app.route('/api/customer/<int:customer_id>/history', methods=['GET'])
@@ -61,9 +63,7 @@ def api_update_customer(customer_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-# ENDPOINTY DLA KSIĄŻEK
-
+# ------------ENDPOINTY DLA KSIĄŻEK
 
 # pobiera tylko nowe książki
 @app.route('/api/books/regular', methods=['GET'])
@@ -106,8 +106,7 @@ def api_get_bestsellers():
         return jsonify({"error": str(e)}), 500
 
 
-# ENDPOINT STATYSTYK
-
+# ------------------ENDPOINT STATYSTYK
 
 # zbiera i updateuje statystyki wyświetlane na stronie głównej
 @app.route('/api/stats', methods=['GET'])
@@ -140,7 +139,7 @@ def api_get_stats():
         return jsonify({"error": str(e)}), 500
 
 
-# ENDPOINTY DLA ADMINA
+# -----------ENDPOINTY DLA ADMINA
 
 # dodawanie nowej książki i wrzucanie jej na magazyn
 @app.route('/api/admin/books/add', methods=['POST'])
@@ -224,6 +223,44 @@ def api_report_loyalty():
 
 
 if __name__ == '__main__':
-    # uruchomienie aplikacji w trybie debug aby łatwiej wyłapywać błędy
-    # serwer słucha na porcie 5000
-    app.run(debug=True, port=5000)
+    #Domyślne dane 
+    DEFAULT_CUSTOMER_ID = 1
+    DEFAULT_ITEMS = [
+        {'storage_id': 1, 'quantity': 1},
+        {'storage_id': 2, 'quantity': 2}
+    ]
+    
+    # Sprawdzamy, czy uruchamiamy skrypt z argumentami (do prezentacji w terminalu)
+    if len(sys.argv) > 1:
+        #przykładowe uruchomienie:
+        #python main.py process_order 1 5
+        try:
+            nazwa_funkcji = sys.argv[1]# Pierwszy argument po nazwie pliku to nazwa funkcji, np. "process_order"
+            if nazwa_funkcji == "process_order":
+                # Jeśli podano ID klienta w konsoli, użyj go, inaczej bierzemy domyślne.
+                customer_id = int(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_CUSTOMER_ID
+                # Jeśli podano ID zamówienia (storage_id) w konsoli, tworzymy dla niego koszyk, inaczej domyślny koszyk
+                if len(sys.argv) > 3:
+                    storage_id = int(sys.argv[3])
+                    items = [{'storage_id': storage_id, 'quantity': 1}]
+                else:
+                    items = DEFAULT_ITEMS
+
+                print(f"Wykonuje dla klienta ID: {customer_id}")
+                print(f"Zawartosc koszyka: {items}")
+                # Wywołanie transakcji
+                order_id = process_order(customer_id, items)
+                if order_id:
+                    print(f"SUKCES! Transakcja zapisana. ID zamowienia: {order_id}")
+                else:
+                    print("BLAD! Transakcja odrzucona (sprawdz stan magazynowy).")
+            else:
+                print(f"Nieznana funkcja: {nazwa_funkcji}. Dostepne: process_order")
+
+        except Exception as e:
+            print(f"Wystapil blad: {e}")   
+    else: # Jeśli ktoś odpali program bez argumentów (zwykłe python main.py)
+        # uruchomienie aplikacji w trybie debug aby łatwiej wyłapywać błędy
+        # serwer słucha na porcie 5000
+        print("Uruchamiam serwer Flask na porcie 5000...")
+        app.run(debug=True, port=5000)
